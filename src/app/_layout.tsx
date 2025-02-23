@@ -1,17 +1,38 @@
+import 'react-native-get-random-values';
 import '@/styles/global.css';
 
-import { Stack } from 'expo-router';
+import { Slot, useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
+import { StatusBar, View } from 'react-native';
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+
+const InitialLayout = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    console.log('User: ', isSignedIn);
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (isSignedIn && !inAuthGroup) {
+      router.replace('/home');
+    } else if (!isSignedIn) {
+      router.replace('/login');
+    }
+  }, [isSignedIn]);
+
+  return <Slot />;
 };
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-    </Stack>
+    <AuthProvider>
+      <StatusBar backgroundColor="#FFFCFF" barStyle="dark-content" />
+      <InitialLayout />
+    </AuthProvider>
   );
 }
