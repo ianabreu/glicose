@@ -1,9 +1,10 @@
 import 'react-native-get-random-values';
-import '@/styles/global.css';
-
+import { useFonts } from 'expo-font';
 import { Slot, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { StatusBar, View } from 'react-native';
+import { StatusBar } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -15,7 +16,6 @@ const InitialLayout = () => {
   useEffect(() => {
     if (!isLoaded) return;
 
-    console.log('User: ', isSignedIn);
     const inAuthGroup = segments[0] === '(auth)';
 
     if (isSignedIn && !inAuthGroup) {
@@ -23,16 +23,34 @@ const InitialLayout = () => {
     } else if (!isSignedIn) {
       router.replace('/login');
     }
-  }, [isSignedIn]);
+  }, [isLoaded, isSignedIn]);
 
   return <Slot />;
 };
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    Normal: require('@/assets/fonts/NunitoSans_10pt-Regular.ttf'),
+    Bold: require('@/assets/fonts/NunitoSans_10pt-Bold.ttf'),
+    Medium: require('@/assets/fonts/NunitoSans_10pt-Medium.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
   return (
     <AuthProvider>
-      <StatusBar backgroundColor="#FFFCFF" barStyle="dark-content" />
+      <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent />
       <InitialLayout />
+      <Toast topOffset={60} />
     </AuthProvider>
   );
 }

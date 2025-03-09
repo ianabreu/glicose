@@ -1,76 +1,39 @@
-import { type VariantProps, cva } from 'class-variance-authority';
-import { ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { cn } from '../lib/utils';
+import { colors } from '@/constants/colors';
 
-const buttonVariants = cva('flex flex-row items-center justify-center rounded-md w-full min-h-14', {
-  variants: {
-    variant: {
-      default: 'bg-primary',
-      secondary: 'bg-secondary',
-      destructive: 'bg-destructive',
-      ghost: 'bg-slate-700',
-      link: 'text-primary underline-offset-4',
-    },
-    size: {
-      default: 'h-10 px-4',
-      sm: 'h-8 px-2',
-      lg: 'h-12 px-8',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-    size: 'default',
-  },
-});
-
-const buttonTextVariants = cva('text-center font-medium', {
-  variants: {
-    variant: {
-      default: 'text-primary-foreground',
-      secondary: 'text-secondary-foreground',
-      destructive: 'text-destructive-foreground',
-      ghost: 'text-primary-foreground',
-      link: 'text-primary-foreground underline',
-    },
-    size: {
-      default: 'text-base',
-      sm: 'text-sm',
-      lg: 'text-xl',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-    size: 'default',
-  },
-});
-
-interface ButtonProps
-  extends React.ComponentPropsWithoutRef<typeof TouchableOpacity>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends React.ComponentPropsWithoutRef<typeof TouchableOpacity> {
   label: string;
-  labelClasses?: string;
+  disabled?: boolean;
 }
-function Button({
-  label,
-  labelClasses,
-  className,
-  variant,
-  size,
-  disabled = false,
-  ...props
-}: ButtonProps) {
+function Button({ label, disabled = false, ...props }: ButtonProps) {
   return (
-    <TouchableOpacity className={cn(buttonVariants({ variant, size, className }))} {...props}>
+    <TouchableOpacity activeOpacity={0.8} style={styles.button} {...props}>
       {disabled ? (
-        <ActivityIndicator className="text-white" size={22} />
+        <ActivityIndicator color={colors.onSecondary} size={22} />
       ) : (
-        <Text className={cn(buttonTextVariants({ variant, size, className: labelClasses }))}>
-          {label}
-        </Text>
+        <Text style={styles.text}>{label}</Text>
       )}
     </TouchableOpacity>
   );
 }
 
-export { Button, buttonVariants, buttonTextVariants };
+export { Button };
+
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 56,
+    width: '100%',
+    minHeight: 48,
+    backgroundColor: colors.secondary,
+  },
+  text: {
+    fontFamily: 'Medium',
+    textAlign: 'center',
+    fontSize: 16,
+    color: colors.onSecondary,
+  },
+});

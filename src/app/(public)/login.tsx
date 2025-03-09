@@ -1,11 +1,22 @@
+import Constanst from 'expo-constants';
+import { Stack } from 'expo-router';
 import { useState } from 'react';
-import { Text, View, Image } from 'react-native';
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+} from 'react-native';
 
 import onBoardingImage from '@/assets/onboarding.png';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
-import { createUser } from '@/services/database';
+import { UserServices } from '@/database/services';
 
 export default function LoginPage() {
   const { updateUser } = useAuth();
@@ -23,11 +34,11 @@ export default function LoginPage() {
   async function addUser() {
     try {
       if (!name || name === '') {
-        setError('Digite seu nome.');
+        setError('Nome é obrigatório.');
         return;
       }
       setLoading(true);
-      const user = await createUser({ name });
+      const user = await UserServices.create({ name });
       updateUser(user);
     } catch (e) {
       console.log(e);
@@ -37,14 +48,53 @@ export default function LoginPage() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center gap-4 bg-background px-4">
-      <View className="h-full max-h-64 w-full max-w-64">
-        <Image source={onBoardingImage} className="h-full w-full" resizeMode="contain" />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={{ flex: 1 }}>
+        <Stack.Screen options={{ navigationBarColor: colors.background }} />
+
+        <KeyboardAvoidingView style={styles.container}>
+          <View>
+            <Image source={onBoardingImage} style={styles.image} resizeMode="contain" />
+          </View>
+          <Text style={styles.wellcome}>Bem vindo!</Text>
+          <Text style={styles.label}>Insira seu nome para iniciar</Text>
+          <Input
+            placeholder="Digite seu nome"
+            value={name}
+            onChangeText={onChangeText}
+            error={error}
+          />
+          <Button label="Entrar" disabled={loading} onPress={addUser} />
+        </KeyboardAvoidingView>
       </View>
-      <Text className="text-center text-4xl font-bold">Bem vindo!</Text>
-      <Text className="text-center text-xl">Insira seu nome para iniciar</Text>
-      <Input value={name} onChangeText={onChangeText} error={error} />
-      <Button size="lg" label="Entrar" onPress={addUser} disabled={loading} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingTop: Constanst.statusBarHeight + 16,
+    backgroundColor: colors.background,
+    gap: 8,
+  },
+
+  image: {
+    maxWidth: '80%',
+  },
+  wellcome: {
+    fontFamily: 'Bold',
+    textAlign: 'center',
+    fontSize: 22,
+    color: colors.onBackground,
+  },
+  label: {
+    fontFamily: 'Medium',
+    textAlign: 'center',
+    fontSize: 16,
+    color: colors.onBackground,
+  },
+});

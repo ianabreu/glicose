@@ -1,14 +1,14 @@
 import Realm from 'realm';
 
-class SettingsSchema extends Realm.Object {
+class ProfileSchema extends Realm.Object {
   hasSeenOnboarding!: boolean;
 
   static schema: Realm.ObjectSchema = {
-    name: 'Settings',
+    name: 'Profile',
     properties: {
       hasSeenOnboarding: { type: 'bool', default: false },
     },
   };
 }
 
-export { SettingsSchema };
+export { ProfileSchema };
