@@ -6,11 +6,10 @@ import { seedGlycemicRanges } from './GlycemicRangeServices';
 import { CreateUserDTO, UserDTO } from '@/@types/User';
 import { getRealm } from '@/database/realm';
 
-//------------------------- Usuarios --------------------------------------
 export const UserServices = {
   async create({ name }: CreateUserDTO): Promise<UserDTO> {
+    const realm = await getRealm();
     try {
-      const realm = await getRealm();
       let user: UserDTO | undefined;
       realm.write(() => {
         const newUser = realm.create('User', {
@@ -30,8 +29,8 @@ export const UserServices = {
     }
   },
   async get(): Promise<UserDTO | null> {
+    const realm = await getRealm();
     try {
-      const realm = await getRealm();
       const arrayUsers = realm.objects<UserSchema>('User');
       if (arrayUsers.length === 0) {
         return null;
@@ -44,26 +43,3 @@ export const UserServices = {
     }
   },
 };
-
-// export async function getAllUsers(): Promise<UserDTO[]> {
-//   try {
-//     const userData: UserDTO[] = [];
-//     const realm = await getRealm();
-//     const response = realm.objects<UserSchema>('User').sorted('name', true);
-//     response.forEach(({ uid, name }) => {
-//       userData.push({ uid, name });
-//     });
-//     return userData;
-//   } catch (error) {
-//     console.log(error);
-//     throw error;
-//   }
-// }
-
-// export async function getUserById(userId: string) {
-//   const realm = await getRealm();
-//   const response = realm.objectForPrimaryKey('User', userId);
-//   console.log(response);
-// }
-
-//------------------------- Glicose --------------------------------------

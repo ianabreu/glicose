@@ -13,6 +13,7 @@ export const GlycemicRangeServices = {
     glucose_normal,
     userId,
   }: CreateGlycemicRangeDTO): Promise<GlycemicRangeDTO> {
+    const realm = await getRealm();
     try {
       if (typeof glucose_min !== 'number' || isNaN(glucose_min)) {
         throw new Error('glucose_min precisa ser um número válido!');
@@ -23,7 +24,6 @@ export const GlycemicRangeServices = {
       if (typeof glucose_normal !== 'number' || isNaN(glucose_normal)) {
         throw new Error('glucose_normal precisa ser um número válido!');
       }
-      const realm = await getRealm();
 
       let glycemicRange: GlycemicRangeDTO | undefined;
 
@@ -48,25 +48,32 @@ export const GlycemicRangeServices = {
       if (!glycemicRange) {
         throw new Error('Erro ao criar condição de glicose');
       }
+
       return glycemicRange;
     } catch (error) {
       console.log(error);
+
       throw error;
     }
   },
   async get({ userId }: { userId: string }): Promise<GlycemicRangeDTO[]> {
     const realm = await getRealm();
-    const response = realm
-      .objects<GlycemicRangeSchema>('GlycemicRange')
-      .filtered('userId == $0', userId);
-    return response.map((item) => ({
-      id: item.id,
-      description: item.description,
-      glucose_max: item.glucose_max,
-      glucose_min: item.glucose_min,
-      glucose_normal: item.glucose_normal,
-      userId: item.userId,
-    }));
+    try {
+      const response = realm
+        .objects<GlycemicRangeSchema>('GlycemicRange')
+        .filtered('userId == $0', userId);
+      return response.map((item) => ({
+        id: item.id,
+        description: item.description,
+        glucose_max: item.glucose_max,
+        glucose_min: item.glucose_min,
+        glucose_normal: item.glucose_normal,
+        userId: item.userId,
+      }));
+    } catch (error) {
+      console.log(error);
+      return [] as GlycemicRangeDTO[];
+    }
   },
 };
 

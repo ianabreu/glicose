@@ -4,22 +4,27 @@ import { CreateGlucoseDTO, GlucoseDTO } from '@/@types/Glucose';
 import { GlycemicRangeDTO } from '@/@types/GlycemicRange';
 import { GlycemicRangeServices } from '@/database/services';
 import { GlucoseServices } from '@/database/services/GlucoseServices';
-import { subtractDate } from '@/utils/date';
 
 export function useGlucose(userId: string) {
   const [glucoseRecords, setGlucoseRecords] = useState<GlucoseDTO[]>([]);
+  const [metrics, setMetrics] = useState<{
+    avarage: number;
+    total: number;
+    max: GlucoseDTO;
+    min: GlucoseDTO;
+  }>();
   const [lastGlucoseRecord, setLastGlucoseRecord] = useState<GlucoseDTO | null>(null);
   const [glycemicRanges, setGlycemicRanges] = useState<GlycemicRangeDTO[]>([]);
 
   useEffect(() => {
-    loadRecords(subtractDate(new Date(), 7), new Date());
     getGlycemicRanges();
   }, []);
 
-  async function loadRecords(startDate: Date, endDate: Date) {
-    const records = await GlucoseServices.getAll({ userId, startDate, endDate });
+  async function getInformations(oldDate: Date, recentDate: Date) {
+    const { items, metrics } = await GlucoseServices.getAll({ userId, oldDate, recentDate });
 
-    setGlucoseRecords(records);
+    setGlucoseRecords(items);
+    setMetrics(metrics);
   }
   async function getLastRecord() {
     const record = await GlucoseServices.getLast(userId);
@@ -38,10 +43,6 @@ export function useGlucose(userId: string) {
     const response = await GlycemicRangeServices.get({ userId });
     setGlycemicRanges(response);
   }
-  //   async function removeRecord(id: string) {
-  //     await GlucoseServices.delete(id);
-  //     loadRecords();
-  //   }
 
   return {
     glucoseRecords,
@@ -49,6 +50,7 @@ export function useGlucose(userId: string) {
     glycemicRanges,
     getLastRecord,
     lastGlucoseRecord,
-    //removeRecord
+    metrics,
+    getInformations,
   };
 }

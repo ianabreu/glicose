@@ -13,11 +13,11 @@ export const GlucoseServices = {
     notes,
     glycemicRangeId,
   }: CreateGlucoseDTO): Promise<GlucoseDTO> {
+    const realm = await getRealm();
     try {
       if (typeof valueInMgDl !== 'number' || isNaN(valueInMgDl)) {
         throw new Error('valueInMgDl precisa ser um número válido!');
       }
-      const realm = await getRealm();
       let glucoseRecord: GlucoseDTO | undefined;
       realm.write(() => {
         const newGlucoseRecord = realm.create('Glucose', {
@@ -40,51 +40,76 @@ export const GlucoseServices = {
       if (!glucoseRecord) {
         throw new Error('Erro ao criar registro de glicose');
       }
+
       return glucoseRecord;
     } catch (error) {
       console.log(error);
+
       throw error;
     }
   },
   async getLast(userId: string): Promise<GlucoseDTO | null> {
     const realm = await getRealm();
-    const response = realm
-      .objects<GlucoseSchema>('Glucose')
-      .filtered('userId == $0', userId)
-      .sorted('date', true)[0];
-    if (!response) {
-      return null;
+    try {
+      const response = realm
+        .objects<GlucoseSchema>('Glucose')
+        .filtered('userId == $0', userId)
+        .sorted('date', true)[0];
+      if (!response) {
+        return null;
+      }
+
+      return {
+        id: response.id,
+        date: response.date,
+        glycemicRangeId: response.glycemicRangeId,
+        userId: response.userId,
+        valueInMgDl: response.valueInMgDl,
+        notes: response.notes,
+      };
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-    return {
-      id: response.id,
-      date: response.date,
-      glycemicRangeId: response.glycemicRangeId,
-      userId: response.userId,
-      valueInMgDl: response.valueInMgDl,
-      notes: response.notes,
-    };
   },
   async getAll({
     userId,
-    startDate,
-    endDate,
+    oldDate,
+    recentDate,
   }: {
     userId: string;
-    startDate: Date;
-    endDate: Date;
-  }): Promise<GlucoseDTO[]> {
+    oldDate: Date;
+    recentDate: Date;
+  }) {
     const realm = await getRealm();
-    const response = realm
-      .objects<GlucoseSchema>('Glucose')
-      .filtered('userId == $0 AND date >= $1 AND date <= $2', userId, startDate, endDate)
-      .sorted('date', true);
-    return response.map((item) => ({
-      id: item.id,
-      userId: item.userId,
-      valueInMgDl: item.valueInMgDl,
-      date: item.date,
-      notes: item.notes,
-      glycemicRangeId: item.glycemicRangeId,
-    }));
+    try {
+      const response = realm
+        .objects<GlucoseSchema>('Glucose')
+        .filtered('userId == $0 AND date >= $1 AND date <= $2', userId, oldDate, recentDate);
+
+      const maxItem = response.sorted('valueInMgDl', true)[0];
+      const minItem = response.sorted('valueInMgDl', false)[0];
+
+      const items: GlucoseDTO[] = response.sorted('date', true).map((item) => ({
+        id: item.id,
+        userId: item.userId,
+        valueInMgDl: item.valueInMgDl,
+        date: item.date,
+        notes: item.notes,
+        glycemicRangeId: item.glycemicRangeId,
+      }));
+      return {
+        items,
+        metrics: {
+          avarage: response.avg('valueInMgDl') || 0,
+          total: response.length,
+          max: maxItem,
+          min: minItem,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   },
 };

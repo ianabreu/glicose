@@ -10,19 +10,27 @@ import { Info } from '@/components/InfoCard';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGlucose } from '@/hooks/useGlucose';
+import { subtractDate } from '@/utils/date';
 
 export default function Home() {
   const { user } = useAuth();
+
   const isFocused = useIsFocused();
 
-  const { glucoseRecords, lastGlucoseRecord, glycemicRanges, getLastRecord } = useGlucose(
-    user?.uid as string
-  );
+  const {
+    glucoseRecords,
+    lastGlucoseRecord,
+    glycemicRanges,
+    getLastRecord,
+    metrics,
+    getInformations,
+  } = useGlucose(user?.uid as string);
 
   useEffect(() => {
     if (!isFocused) {
-      return;
     }
+    getInformations(subtractDate(new Date(), 7), new Date());
+
     getLastRecord();
   }, [isFocused]);
 
@@ -62,7 +70,7 @@ export default function Home() {
           <Info.Title>Média (7 dias)</Info.Title>
           <Info.Row>
             <Info.Icon name="activity" />
-            <Info.Value unit="mg/dl">124</Info.Value>
+            <Info.Value unit="mg/dl">{metrics?.avarage.toFixed(1)}</Info.Value>
           </Info.Row>
         </Info.Container>
 
@@ -70,7 +78,7 @@ export default function Home() {
           <Info.Title>Total de Medições</Info.Title>
           <Info.Row>
             <Info.Icon name="bar-chart-2" />
-            <Info.Value>20</Info.Value>
+            <Info.Value>{metrics?.total}</Info.Value>
           </Info.Row>
         </Info.Container>
 
@@ -78,7 +86,12 @@ export default function Home() {
           <Info.Title>Maior Valor</Info.Title>
           <Info.Row>
             <Info.Icon name="trending-up" />
-            <Info.Value unit="mg/dl">236</Info.Value>
+            <Info.Value unit="mg/dl">{metrics?.max.valueInMgDl}</Info.Value>
+          </Info.Row>
+          <Info.Row>
+            <Info.Helper>
+              {glycemicRanges.find((item) => item.id === metrics?.max.glycemicRangeId)?.description}
+            </Info.Helper>
           </Info.Row>
         </Info.Container>
 
@@ -86,19 +99,25 @@ export default function Home() {
           <Info.Title>Menor Valor</Info.Title>
           <Info.Row>
             <Info.Icon name="trending-down" />
-            <Info.Value unit="mg/dl">49</Info.Value>
+            <Info.Value unit="mg/dl">{metrics?.min.valueInMgDl}</Info.Value>
+          </Info.Row>
+          <Info.Row>
+            <Info.Helper>
+              {glycemicRanges.find((item) => item.id === metrics?.min.glycemicRangeId)?.description}
+            </Info.Helper>
           </Info.Row>
         </Info.Container>
       </View>
-      {glucoseRecords.map((item) => (
-        <View key={item.id}>
-          <Text>{item.id}</Text>
-          <Text>{item.userId}</Text>
-          <Text>{item.date.toISOString()}</Text>
-          <Text>{item.glycemicRangeId}</Text>
-          <Text>{item.valueInMgDl}</Text>
-        </View>
-      ))}
+      {glucoseRecords.length > 0 &&
+        glucoseRecords.map((item) => (
+          <View key={item.id}>
+            <Text>{item.id}</Text>
+            <Text>{item.userId}</Text>
+            <Text>{item.date.toISOString()}</Text>
+            <Text>{item.glycemicRangeId}</Text>
+            <Text>{item.valueInMgDl}</Text>
+          </View>
+        ))}
 
       {/* <BarChart data={data} />
       <LineChart data={data} />

@@ -1,5 +1,3 @@
-import * as FileSystem from 'expo-file-system';
-import { Platform } from 'react-native';
 import Realm from 'realm';
 
 import { GlycemicRangeSchema, GlucoseSchema, UserSchema } from './schemas';

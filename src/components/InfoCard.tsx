@@ -35,6 +35,13 @@ function Value({ unit, children, style, ...props }: ValueProps) {
     </View>
   );
 }
+function Helper({ children, style, ...props }: ValueProps) {
+  return (
+    <Text style={[styles.helper, style]} {...props}>
+      {children}
+    </Text>
+  );
+}
 
 function Container({ children, style, ...props }: ContainerProps) {
   return (
@@ -58,6 +65,7 @@ export const Info = {
   Value,
   Icon,
   Row,
+  Helper,
 };
 
 const styles = StyleSheet.create({
@@ -70,6 +78,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   title: {
+    fontFamily: 'Medium',
+    fontSize: 16,
+    color: colors.onSurface,
+    textAlign: 'center',
+  },
+  helper: {
     fontFamily: 'Medium',
     fontSize: 14,
     color: colors.onSurface,
