@@ -21,6 +21,13 @@ export default function AuthLayout() {
         }}
         redirect={!isSignedIn}
       />
+      <Stack.Screen
+        name="profile"
+        options={{
+          headerTitle: 'Perfil',
+        }}
+        redirect={!isSignedIn}
+      />
     </Stack>
   );
 }

@@ -1,9 +1,11 @@
 import { Feather } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useNavigation } from 'expo-router';
-import { useState } from 'react';
+import { Stack, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
+  Alert,
+  BackHandler,
   Keyboard,
   Pressable,
   ScrollView,
@@ -26,8 +28,29 @@ import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGlucose } from '@/hooks/useGlucose';
 
-export default function New(props: any) {
-  const navigation = useNavigation();
+export default function New() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const backAction = () => {
+      if (router.canGoBack()) {
+        router.back();
+        return true;
+      }
+
+      Alert.alert('Sair', 'Deseja fechar o aplicativo?', [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Sair', onPress: () => BackHandler.exitApp() },
+      ]);
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, []);
+
   const { user } = useAuth();
   const { glycemicRanges, addRecord } = useGlucose(user?.uid || '');
   const [selectedGlycemicRangeIndex, setSelectedGlycemicRangeIndex] = useState<number>(0);
@@ -35,7 +58,7 @@ export default function New(props: any) {
   const [date, setDate] = useState(new Date());
   const [openDateModal, setOpenDateModal] = useState(false);
 
-  const [value, setValue] = useState('80');
+  const [value, setValue] = useState('');
   const [notes, setNotes] = useState('');
 
   const handleChangeText = (text: string) => {
@@ -67,13 +90,17 @@ export default function New(props: any) {
 
     try {
       await addRecord(data);
-      navigation.goBack();
+      router.replace('/(auth)/home');
     } catch (error) {
       console.log(error);
     }
   }
   function handleBack() {
-    navigation.goBack();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      Alert.alert('Atenção', 'Você já está na primeira tela!');
+    }
   }
 
   function handleSelectChange(valueIndex: number) {
@@ -89,10 +116,12 @@ export default function New(props: any) {
 
         {/**************************Header*********************/}
         <View style={styles.headerArea}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleBack}>
-            <Feather name="arrow-left" size={30} color={colors.onPrimary} />
-          </TouchableOpacity>
-          <Text style={styles.title}>Nova Medição</Text>
+          {router.canGoBack() && (
+            <TouchableOpacity style={styles.iconButton} onPress={handleBack}>
+              <Feather name="arrow-left" size={30} color={colors.onPrimary} />
+            </TouchableOpacity>
+          )}
+          <Text style={styles.title}>{router.canGoBack() ? 'Nova' : 'Primeira'} Medição</Text>
         </View>
         {/**************************Fim*Header*********************/}
 
@@ -103,6 +132,7 @@ export default function New(props: any) {
               value={value}
               keyboardType="numeric"
               onChangeText={handleChangeText}
+              placeholder="80"
               placeholderTextColor={colors.placeholderOnPrimary}
               style={styles.inputValue}
             />

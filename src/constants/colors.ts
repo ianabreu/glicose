@@ -154,4 +154,10 @@ export const colors = {
   warning: defaultColors.yellow[500],
   error: defaultColors.red[500],
   gradient: [defaultColors.blue[400], defaultColors.blue[600], defaultColors.blue[900]],
+  level: {
+    low: [defaultColors.cyan[500], defaultColors.cyan[600], defaultColors.cyan[700]],
+    normal: [defaultColors.green[500], defaultColors.green[600], defaultColors.green[700]],
+    preDiabetes: [defaultColors.yellow[500], defaultColors.yellow[600], defaultColors.yellow[700]],
+    diabetes: [defaultColors.red[500], defaultColors.red[600], defaultColors.red[700]],
+  },
 };

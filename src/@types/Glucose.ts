@@ -1,3 +1,5 @@
+import { GlycemicRangeDTO } from './GlycemicRange';
+
 import { GlucoseSchema } from '@/database/schemas';
 
 interface GlucoseDTO
@@ -8,4 +10,8 @@ interface GlucoseDTO
 
 type CreateGlucoseDTO = Omit<GlucoseDTO, 'id'>;
 
-export { GlucoseDTO, CreateGlucoseDTO };
+interface GlucoseWithGlycemicRangeDTO extends GlucoseDTO {
+  glycemicRange: GlycemicRangeDTO | undefined;
+}
+
+export { GlucoseDTO, CreateGlucoseDTO, GlucoseWithGlycemicRangeDTO };

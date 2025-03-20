@@ -15,8 +15,9 @@ export const UserServices = {
         const newUser = realm.create('User', {
           uid: uuidv4(),
           name,
+          lastName: '',
         });
-        user = { uid: newUser.uid, name: newUser.name };
+        user = { uid: newUser.uid, name: newUser.name, lastName: newUser.lastName };
       });
       if (!user) {
         throw new Error('Erro ao criar usuário');

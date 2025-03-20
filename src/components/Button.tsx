@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-nat
 
 import { colors } from '@/constants/colors';
 
-interface ButtonProps extends React.ComponentPropsWithoutRef<typeof TouchableOpacity> {
+export interface ButtonProps extends React.ComponentPropsWithoutRef<typeof TouchableOpacity> {
   label: string;
   disabled?: boolean;
 }
