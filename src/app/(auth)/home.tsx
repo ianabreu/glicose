@@ -1,59 +1,66 @@
-import { Feather } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import { Link, Stack, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { Chart } from '@/components/Chart';
+import { Empty } from '@/components/Empty';
+import { Filters } from '@/components/Filters';
+import { Header } from '@/components/Header';
 import { Info } from '@/components/InfoCard';
-import ItemList from '@/components/ItemList';
-import { SelectPeriod } from '@/components/SelectPeriod';
+import { Section } from '@/components/Section';
+import { Title } from '@/components/Title';
 import { colors } from '@/constants/colors';
-import { useAuth } from '@/contexts/AuthContext';
-import { useGlucose } from '@/hooks/useGlucose';
+import { useGlucose } from '@/contexts/GlucoseContext';
 
 export default function Home() {
-  const { user } = useAuth();
-
   const isFocused = useIsFocused();
-
+  const router = useRouter();
   const {
     glucoseRecords,
+    metrics,
     lastGlucoseRecord,
+    loadingLastGlucoseRecord,
+    selectedPeriodType,
     glycemicRanges,
-    getLastGlucoseRecord,
-    getMetrics,
-    loading,
-  } = useGlucose(user?.uid as string);
-  const [period, setPeriod] = useState(['7 Dias', '14 Dias', '30 Dias', 'Personalizado']);
-  const [selectedPeriod, setSelectedPeriod] = useState('7 Dias');
-  const router = useRouter();
+  } = useGlucose();
+
+  const [openFiltersModal, setOpenFiltersModal] = useState(false);
 
   useEffect(() => {
     if (!isFocused) return;
-    getLastGlucoseRecord().catch((error) => {
-      if (error instanceof Error && error.message === 'Nenhum registro encontrado') {
-        router.replace('/(auth)/new');
-        Toast.show({
-          type: 'info',
-          text1: 'Novo registro',
-          text2: 'Insira seu 1º registro',
-          text1Style: { fontFamily: 'Bold', fontSize: 18, color: colors.onSurface },
-          text2Style: { fontFamily: 'Medium', fontSize: 16, color: colors.onBackground },
-          position: 'bottom',
-        });
-      }
-    });
+
+    if (!loadingLastGlucoseRecord && lastGlucoseRecord === null) {
+      router.replace('/(auth)/new');
+
+      Toast.show({
+        type: 'info',
+        text1: 'Novo registro',
+        text2: 'Insira seu 1º registro',
+        text1Style: { fontFamily: 'Bold', fontSize: 18, color: colors.onSurface },
+        text2Style: { fontFamily: 'Medium', fontSize: 16, color: colors.onBackground },
+        position: 'bottom',
+      });
+    }
   }, [isFocused]);
 
-  const metrics = getMetrics();
+  function openFilters() {
+    setOpenFiltersModal(true);
+  }
+  function handleCloseFilters() {
+    setOpenFiltersModal(false);
+  }
 
-  if (loading) {
+  if (loadingLastGlucoseRecord) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
         <ActivityIndicator size={35} color={colors.primary} />
+        <Text>Loading</Text>
       </View>
     );
   } else {
@@ -63,41 +70,40 @@ export default function Home() {
           <Stack.Screen options={{ navigationBarColor: colors.background }} />
           <View>
             <View style={{ gap: 4 }}>
-              <View style={styles.headerArea}>
-                <Text style={styles.title}>Página Inicial</Text>
-                <Link href="/(auth)/new">
-                  <Feather name="external-link" size={30} />
-                </Link>
-                <Link href="/(auth)/profile">
-                  <Feather name="user" size={30} />
-                </Link>
-              </View>
+              <Header />
               {lastGlucoseRecord && <Card data={lastGlucoseRecord} />}
             </View>
             <Link style={styles.link} href="/(auth)/new">
               Novo Registro
             </Link>
-            <View
-              style={{
-                flexDirection: 'row',
-                width: '100%',
-                justifyContent: 'space-between',
-                height: 'auto',
-              }}>
+
+            <Section>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Title>Informações</Title>
+                <Button
+                  label="Filtro"
+                  variant="stroke"
+                  onPress={openFilters}
+                  icon={<MaterialCommunityIcons name="filter" color={colors.secondary} size={20} />}
+                />
+                <Modal visible={openFiltersModal} transparent animationType="slide">
+                  <Filters closeModal={handleCloseFilters} />
+                </Modal>
+              </View>
+
               <Text
                 style={{
-                  fontSize: 20,
-                  fontFamily: 'Medium',
-                  color: colors.primary,
-                  flex: 1,
+                  fontFamily: 'Bold',
+                  opacity: 0.8,
+                  color: colors.onSurface,
+                  fontSize: 12,
                 }}>
-                Informações
+                {selectedPeriodType || 'Últimos 100 resultados'}
               </Text>
-              <View style={{ flex: 1 }}>
-                <SelectPeriod options={period} label={selectedPeriod} />
-              </View>
-            </View>
-            {metrics && glucoseRecords.length > 0 && (
+              <Chart data={glucoseRecords} />
+            </Section>
+
+            {metrics && metrics.total > 0 ? (
               <View style={{ flexWrap: 'wrap', flexDirection: 'row', gap: 16, marginVertical: 8 }}>
                 <Info.Container>
                   <Info.Title>Média</Info.Title>
@@ -147,21 +153,10 @@ export default function Home() {
                   </Info.Row>
                 </Info.Container>
               </View>
+            ) : (
+              <Empty />
             )}
-            <Link style={styles.link} href="/(auth)/new">
-              Exportar Relatório
-            </Link>
-            <Text
-              style={{
-                fontSize: 20,
-                fontFamily: 'Medium',
-                color: colors.primary,
-              }}>
-              Resultados
-            </Text>
           </View>
-
-          <ItemList data={glucoseRecords} />
         </ScrollView>
       </View>
     );
@@ -178,7 +173,7 @@ const styles = StyleSheet.create({
   },
   link: {
     marginVertical: 8,
-    borderRadius: 56,
+    borderRadius: 8,
     textAlign: 'center',
     paddingVertical: 12,
     fontFamily: 'Medium',
@@ -186,17 +181,31 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     color: colors.onSecondary,
   },
-  headerArea: {
-    minHeight: 56,
-    width: '100%',
-    alignItems: 'center',
-    gap: 16,
+  filterArea: {
+    height: 'auto',
+    maxHeight: 56,
     flexDirection: 'row',
-    marginBottom: 8,
   },
-  title: {
-    fontFamily: 'Bold',
-    fontSize: 24,
-    color: colors.primary,
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    padding: 8,
+    width: '90%',
+    borderRadius: 8,
+    gap: 16,
+    backgroundColor: colors.background,
+  },
+  header: {
+    fontFamily: 'Medium',
+    fontSize: 18,
+    textAlign: 'center',
+    color: colors.onBackground,
+    borderBottomColor: colors.border,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
   },
 });

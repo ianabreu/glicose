@@ -7,6 +7,7 @@ import { StatusBar } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { GlucoseProvider } from '@/contexts/GlucoseContext';
 
 const InitialLayout = () => {
   const { isLoaded, isSignedIn } = useAuth();
@@ -25,7 +26,11 @@ const InitialLayout = () => {
     }
   }, [isLoaded, isSignedIn]);
 
-  return <Slot />;
+  return (
+    <GlucoseProvider>
+      <Slot />
+    </GlucoseProvider>
+  );
 };
 
 SplashScreen.preventAutoHideAsync();

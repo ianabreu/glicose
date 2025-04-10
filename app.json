@@ -20,7 +20,8 @@
             "./src/assets/fonts/NunitoSans_10pt-Regular.ttf"
           ]
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

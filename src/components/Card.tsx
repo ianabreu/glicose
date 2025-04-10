@@ -1,6 +1,5 @@
-import { Feather, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, Text, TextStyle, View } from 'react-native';
 
 import { GlucoseWithGlycemicRangeDTO } from '@/@types/Glucose';
@@ -25,7 +24,7 @@ export function Card({ data }: CardProps) {
       colors={[colors.gradient[0], colors.gradient[1]]}
       style={styles.card}>
       <View style={{ justifyContent: 'space-between' }}>
-        <Text style={[styles.textBold, { fontSize: 22 }]}>Seu último registro</Text>
+        <Text style={[styles.textBold, { fontSize: 20 }]}>Seu último registro</Text>
         <Text adjustsFontSizeToFit style={[styles.textMedium, { fontSize: 20 }]}>
           {data.glycemicRange?.description}
         </Text>

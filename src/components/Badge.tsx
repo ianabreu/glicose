@@ -1,50 +1,28 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 
-// const badgeVariants = cva(
-//   'flex flex-row items-center rounded-full px-2 py-1 text-xs font-semibold',
-//   {
-//     variants: {
-//       variant: {
-//         default: 'bg-primary',
-//         secondary: 'bg-secondary',
-//         destructive: 'bg-destructive',
-//         success: 'bg-green-500 dark:bg-green-700',
-//       },
-//     },
-//     defaultVariants: {
-//       variant: 'default',
-//     },
-//   }
-// );
+import { colors } from '@/constants/colors';
 
-// const badgeTextVariants = cva('font-medium text-center text-xs', {
-//   variants: {
-//     variant: {
-//       default: 'text-primary-foreground',
-//       secondary: 'text-secondary-foreground',
-//       destructive: 'text-destructive-foreground',
-//       success: 'text-green-100',
-//     },
-//   },
-//   defaultVariants: {
-//     variant: 'default',
-//   },
-// });
-
-export interface BadgeProps {
-  // extends React.ComponentPropsWithoutRef<typeof View>,
-  // VariantProps<typeof badgeVariants> {
-  label: string;
-  labelClasses?: string;
+export interface BadgeProps extends TouchableOpacityProps {
+  active?: boolean;
 }
-function Badge({ label, labelClasses, ...props }: BadgeProps) {
+function Badge({ children, active = false, ...props }: BadgeProps) {
   return (
-    <View style={styles.badgeDefault} {...props}>
-      <Text //className={cn(badgeTextVariants({ variant }), labelClasses)}
-      >
-        {label}
+    <TouchableOpacity
+      style={[
+        styles.badgeDefault,
+        active
+          ? {
+              backgroundColor: colors.secondary,
+              borderColor: colors.secondary,
+            }
+          : { backgroundColor: colors.background, borderColor: colors.secondary },
+      ]}
+      {...props}>
+      <Text
+        style={[styles.text, active ? { color: colors.onSecondary } : { color: colors.secondary }]}>
+        {children}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -54,10 +32,13 @@ const styles = StyleSheet.create({
   badgeDefault: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: '50%',
-    fontSize: 12,
-    fontWeight: '600',
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  text: {
+    fontFamily: 'Medium',
+    textAlign: 'center',
+    fontSize: 14,
+    padding: 8,
   },
 });

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Button,
   Modal,
   StyleSheet,
   Text,
@@ -10,6 +9,9 @@ import {
   View,
 } from 'react-native';
 
+import { Button } from './Button';
+import { Calendar } from './Calendar';
+
 import { colors } from '@/constants/colors';
 
 export interface SelectPeriodProps {
@@ -18,8 +20,12 @@ export interface SelectPeriodProps {
 }
 function SelectPeriod({ label, options }: SelectPeriodProps) {
   const [openModal, setOpenModal] = useState(false);
+  const [openCalendar, setOpenCalendar] = useState(false);
   function handleToggleModal() {
     setOpenModal(!openModal);
+  }
+  function handleToggleCalendar() {
+    setOpenCalendar(!openCalendar);
   }
   return (
     <View>
@@ -41,8 +47,8 @@ function SelectPeriod({ label, options }: SelectPeriodProps) {
                     <Text>{option}</Text>
                   </TouchableOpacity>
                 ))}
-              <TextInput value="12/02/2025" />
-              <TextInput value="12/03/2025" />
+              {/* <Button label="12/02/2025" onPress={handleToggleCalendar} /> */}
+              <Calendar />
             </View>
           </View>
         </TouchableWithoutFeedback>

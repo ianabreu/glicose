@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useNavigation, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -26,10 +26,11 @@ import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
-import { useGlucose } from '@/hooks/useGlucose';
+import { useGlucose } from '@/contexts/GlucoseContext';
 
 export default function New() {
   const router = useRouter();
+  const { addGlucoseRecord, glycemicRanges } = useGlucose();
 
   useEffect(() => {
     const backAction = () => {
@@ -52,7 +53,6 @@ export default function New() {
   }, []);
 
   const { user } = useAuth();
-  const { glycemicRanges, addRecord } = useGlucose(user?.uid || '');
   const [selectedGlycemicRangeIndex, setSelectedGlycemicRangeIndex] = useState<number>(0);
 
   const [date, setDate] = useState(new Date());
@@ -89,7 +89,7 @@ export default function New() {
     };
 
     try {
-      await addRecord(data);
+      await addGlucoseRecord(data);
       router.replace('/(auth)/home');
     } catch (error) {
       console.log(error);
