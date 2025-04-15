@@ -12,7 +12,7 @@ import { DateType } from 'react-native-ui-datepicker';
 
 import { useAuth } from './AuthContext';
 
-import { CreateGlucoseDTO, GlucoseWithGlycemicRangeDTO } from '@/@types/Glucose';
+import { CreateGlucoseDTO, GlucoseDTO, GlucoseWithGlycemicRangeDTO } from '@/@types/Glucose';
 import { GlycemicRangeDTO } from '@/@types/GlycemicRange';
 import { GlucoseServices, GlycemicRangeServices } from '@/database/services';
 
@@ -34,12 +34,14 @@ type GlucoseContextData = {
   lastGlucoseRecord: GlucoseWithGlycemicRangeDTO | null;
   metrics: Metrics | null;
   addGlucoseRecord: (data: CreateGlucoseDTO) => Promise<void>;
+  updateGlucoseRecord: (data: GlucoseDTO) => Promise<void>;
   setFilters: (filter: FilterProps) => void;
   selectedPeriod?: PeriodProps;
   selectedGlycemicRange: string[];
   setSelectedPeriodType: Dispatch<SetStateAction<PeriodType | undefined>>;
   selectedPeriodType?: PeriodType;
   periodTypes: PeriodType[];
+  getGlucoseRecords: () => Promise<void>;
 };
 
 export type PeriodType =
@@ -151,6 +153,21 @@ export function GlucoseProvider({ children }: GlucoseProviderProps) {
       notes: data.notes,
       glycemicRangeId: data.glycemicRangeId,
     });
+    await getLastGlucoseRecord();
+    await getGlucoseRecords();
+  }
+  async function updateGlucoseRecord(data: GlucoseDTO) {
+    if (!user) return;
+    await GlucoseServices.update({
+      id: data.id,
+      date: data.date,
+      userId: user.uid,
+      valueInMgDl: data.valueInMgDl,
+      notes: data.notes,
+      glycemicRangeId: data.glycemicRangeId,
+    });
+    await getLastGlucoseRecord();
+    await getGlucoseRecords();
   }
   async function getLastGlucoseRecord() {
     if (!user) return;
@@ -185,7 +202,9 @@ export function GlucoseProvider({ children }: GlucoseProviderProps) {
   return (
     <GlucoseContext.Provider
       value={{
+        updateGlucoseRecord,
         loadingLastGlucoseRecord,
+        getGlucoseRecords,
         glucoseRecords,
         glycemicRanges,
         lastGlucoseRecord,

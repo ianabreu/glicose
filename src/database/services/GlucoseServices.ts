@@ -1,4 +1,6 @@
 import { DateType } from 'react-native-ui-datepicker';
+import { UpdateMode } from 'realm';
+import { DefaultObject } from 'realm/dist/public-types/schema';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GlucoseSchema, GlycemicRangeSchema } from '../schemas';
@@ -50,7 +52,72 @@ export const GlucoseServices = {
       throw error;
     }
   },
-  async getLastGlucoseRecord(userId: string): Promise<GlucoseWithGlycemicRangeDTO> {
+  async update({
+    id,
+    date,
+    valueInMgDl,
+    userId,
+    notes,
+    glycemicRangeId,
+  }: GlucoseDTO): Promise<GlucoseDTO> {
+    const realm = await getRealm();
+    try {
+      if (typeof valueInMgDl !== 'number' || isNaN(valueInMgDl)) {
+        throw new Error('valueInMgDl precisa ser um número válido!');
+      }
+      let glucoseRecord: GlucoseDTO | undefined;
+      realm.write(() => {
+        const newGlucoseRecord = realm.create(
+          'Glucose',
+          {
+            id,
+            valueInMgDl: parseFloat(valueInMgDl.toFixed(2)),
+            notes,
+            userId,
+            date,
+            glycemicRangeId,
+          },
+          UpdateMode.Modified
+        );
+        glucoseRecord = {
+          id: newGlucoseRecord.id,
+          date: newGlucoseRecord.date,
+          valueInMgDl: newGlucoseRecord.valueInMgDl,
+          userId: newGlucoseRecord.userId,
+          notes: newGlucoseRecord.notes,
+          glycemicRangeId: newGlucoseRecord.glycemicRangeId,
+        };
+      });
+      if (!glucoseRecord) {
+        throw new Error('Erro ao atualizar registro de glicose');
+      }
+
+      return glucoseRecord;
+    } catch (error) {
+      console.log(error);
+
+      throw error;
+    }
+  },
+  async delete(id: string): Promise<boolean> {
+    const realm = await getRealm();
+    const glucose = realm.objectForPrimaryKey('Glucose', id);
+    if (glucose) {
+      try {
+        const isDelete = realm.write(() => {
+          realm.delete(glucose);
+          return true;
+        });
+        return isDelete;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    } else {
+      return false;
+    }
+  },
+  async getLastGlucoseRecord(userId: string): Promise<GlucoseWithGlycemicRangeDTO | null> {
     const realm = await getRealm();
     try {
       const response = realm
@@ -58,7 +125,8 @@ export const GlucoseServices = {
         .filtered('userId == $0', userId)
         .sorted('date', true)[0];
       if (!response) {
-        throw new Error('Nenhum registro encontrado');
+        return null;
+        // throw new Error('Nenhum registro encontrado');
       }
       const glycemicRange = realm.objectForPrimaryKey<GlycemicRangeSchema>(
         'GlycemicRange',
@@ -260,6 +328,12 @@ export const GlucoseServices = {
       };
     });
     return data;
+  },
+  async getById(id: string): Promise<GlucoseDTO> {
+    const realm = await getRealm();
+    const result = realm.objectForPrimaryKey<GlucoseDTO>('Glucose', id);
+    if (!result) throw new Error('Resultado de glicose não encontrado');
+    return result;
   },
   // async getAll({
   //   userId,
