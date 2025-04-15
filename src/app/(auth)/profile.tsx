@@ -1,4 +1,4 @@
-import { Feather, Entypo as Icon } from '@expo/vector-icons';
+import { Feather, Entypo as Icon, MaterialIcons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useNavigation } from 'expo-router';
@@ -15,60 +15,60 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { Title } from '@/components/Title';
+import { Option } from '@/components/profile-option';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Profile() {
-  const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
 
   const [openModal, setOpenModal] = useState(false);
 
   const [firstName, setFirstName] = useState(user?.name);
-  const [lastName, setLastName] = useState('');
+  const [lastName, setLastName] = useState(user?.lastName || '');
 
-  function handleBack() {
-    navigation.goBack();
-  }
   function toogleModal() {
     setOpenModal(!openModal);
   }
-  function handleSave() {}
+  async function handleSave() {
+    if (!firstName || firstName?.trim() === '') return;
+    if (firstName === user?.name && lastName === user?.lastName) return;
+    const isUpdated = await updateProfile({ name: firstName.trim(), lastName: lastName.trim() });
+    if (isUpdated) {
+      toogleModal();
+      Keyboard.dismiss();
+      Toast.show({ type: 'success', text1: 'Dados pessoais atualizados com sucesso!' });
+    } else {
+      Toast.show({ type: 'error', text1: 'Erro ao atualizar seus dados!' });
+    }
+  }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <LinearGradient
-        style={styles.container}
-        colors={[colors.gradient[0], colors.gradient[1], colors.gradient[2]]}>
-        <Stack.Screen options={{ navigationBarColor: colors.gradient[2] }} />
-        <StatusBar barStyle="light-content" />
-
-        {/**************************Header*********************/}
-        <View style={styles.headerArea}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleBack}>
-            <Feather name="arrow-left" size={30} color={colors.onPrimary} />
-          </TouchableOpacity>
-          <Text style={styles.title}>Perfil</Text>
-        </View>
-        {/**************************Fim*Header*********************/}
-
+      <View style={styles.container}>
+        <Stack.Screen
+          options={{
+            navigationBarColor: colors.background,
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.background },
+            headerTitleStyle: { fontSize: 20, fontFamily: 'Bold', color: colors.primary },
+            animation: 'slide_from_right',
+            headerBackVisible: true,
+            headerTintColor: colors.primary,
+          }}
+        />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.legend}>Dados Pessoais</Text>
+          <Title>Dados Pessoais</Title>
 
           <View style={styles.card}>
             <Pressable style={{ width: '100%' }} onPress={toogleModal}>
+              <Input value={user?.name || ''} label="Nome" placeholder="Nome" editable={false} />
               <Input
-                value={firstName}
-                onChangeText={setFirstName}
-                label="Nome"
-                placeholder="Nome"
-                editable={false}
-              />
-              <Input
-                value={lastName}
-                onChangeText={setLastName}
+                value={user?.lastName || ''}
                 label="Sobrenome"
                 placeholder="Sobrenome"
                 editable={false}
@@ -77,39 +77,22 @@ export default function Profile() {
             </Pressable>
           </View>
 
-          <Text style={styles.legend}>Configurações</Text>
-
+          <Title>Configurações</Title>
           <View style={styles.card}>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 8,
-                width: '100%',
-                alignItems: 'center',
-                marginVertical: 2,
-              }}>
-              <Icon
-                name="drop"
-                style={{
-                  backgroundColor: colors.level.diabetes[0],
-                  padding: 8,
-                  borderRadius: 100,
-                  color: colors.onSecondary,
-                  fontSize: 18,
-                }}
-              />
-              <Text style={{ fontFamily: 'Normal', fontSize: 16 }}>
-                Níveis de açúcar recomendados
-              </Text>
-            </View>
+            <Option>
+              <Option.Icon icon="water-drop" />
+              <Option.Title>Níveis de açúcar recomendados</Option.Title>
+              <Option.Icon icon="chevron-right" />
+            </Option>
           </View>
         </ScrollView>
+
         <Modal visible={openModal} transparent animationType="fade">
           <Pressable
             style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
             onPress={Keyboard.dismiss}
           />
-          <View style={[styles.card, { padding: 16 }]}>
+          <View style={[styles.card, { backgroundColor: colors.background, padding: 16 }]}>
             <View
               style={{
                 flexDirection: 'row',
@@ -117,9 +100,7 @@ export default function Profile() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}>
-              <Text style={{ fontFamily: 'Bold', fontSize: 18, textAlign: 'center', flex: 1 }}>
-                Dados Pessoais
-              </Text>
+              <Title>Editar dados pessoais</Title>
               <Pressable
                 onPress={toogleModal}
                 style={{
@@ -127,7 +108,7 @@ export default function Profile() {
                   backgroundColor: colors.surface,
                   borderRadius: 50,
                 }}>
-                <Feather name="x" color={colors.onSurface} size={20} />
+                <MaterialIcons name="close" color={colors.error} size={20} />
               </Pressable>
             </View>
             <Input value={firstName} onChangeText={setFirstName} label="Nome" placeholder="Nome" />
@@ -140,7 +121,7 @@ export default function Profile() {
             <Button label="Salvar" onPress={handleSave} />
           </View>
         </Modal>
-      </LinearGradient>
+      </View>
     </TouchableWithoutFeedback>
   );
 }
@@ -148,39 +129,27 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight + 16,
+    paddingTop: 16,
     paddingHorizontal: 16,
+    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: colors.background,
     padding: 8,
     borderRadius: 8,
     alignItems: 'center',
     gap: 8,
   },
-  headerArea: {
-    minHeight: 56,
-    width: '100%',
-    alignItems: 'center',
-    gap: 16,
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  iconButton: {
-    padding: 8,
-    borderRadius: 8,
-  },
   title: {
     fontFamily: 'Medium',
     fontSize: 20,
     textTransform: 'uppercase',
-    color: colors.onPrimary,
+    color: colors.primary,
   },
   inputValue: {
     marginBottom: 8,
     minWidth: 72,
     borderBottomWidth: 4,
-    borderColor: colors.onPrimary,
+    borderColor: colors.primary,
     textAlign: 'center',
     fontSize: 100,
     color: colors.onPrimary,
@@ -189,7 +158,7 @@ const styles = StyleSheet.create({
 
   legend: {
     fontFamily: 'Medium',
-    color: colors.onPrimary,
+    color: colors.primary,
     fontSize: 20,
     marginVertical: 8,
   },

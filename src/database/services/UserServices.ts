@@ -1,3 +1,4 @@
+import { UpdateMode } from 'realm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { UserSchema } from '../schemas';
@@ -23,6 +24,35 @@ export const UserServices = {
         throw new Error('Erro ao criar usuário');
       }
       await seedGlycemicRanges(user.uid);
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  },
+  async update({ name, lastName, uid }: UserDTO): Promise<UserDTO> {
+    const realm = await getRealm();
+    try {
+      let user: UserDTO | undefined;
+      realm.write(() => {
+        const updatedUser = realm.create(
+          'User',
+          {
+            uid,
+            name,
+            lastName,
+          },
+          UpdateMode.Modified
+        );
+        user = {
+          uid: updatedUser.uid,
+          name: updatedUser.name,
+          lastName: updatedUser.lastName,
+        };
+      });
+      if (!user) {
+        throw new Error('Erro ao atualizar usuário');
+      }
       return user;
     } catch (error) {
       console.log(error);

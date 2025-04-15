@@ -13,6 +13,7 @@ type AuthContextData = {
   isLoaded: boolean;
   updateUser: (newUser: UserDTO) => void;
   checkUser: () => Promise<void>;
+  updateProfile: (userData: Pick<UserDTO, 'name' | 'lastName'>) => Promise<boolean>;
 };
 
 const AuthContext = createContext({} as AuthContextData);
@@ -47,9 +48,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   function updateUser(newUser: UserDTO) {
     setUser(newUser);
   }
+  async function updateProfile(userData: Pick<UserDTO, 'name' | 'lastName'>): Promise<boolean> {
+    if (!user) {
+      return false;
+    } else {
+      const data = await UserServices.update({ uid: user.uid, ...userData });
+      updateUser(data);
+      return true;
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{ user, isLoaded, isSignedIn: !!user, updateUser, checkUser }}>
+    <AuthContext.Provider
+      value={{ user, isLoaded, isSignedIn: !!user, updateUser, checkUser, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

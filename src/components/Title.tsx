@@ -5,9 +5,9 @@ interface TitleProps extends TextProps {
   variant?: keyof typeof styles;
 }
 
-export function Title({ variant = 'title', children, ...rest }: TitleProps) {
+export function Title({ variant = 'title', children, style, ...rest }: TitleProps) {
   return (
-    <Text style={styles[variant]} {...rest}>
+    <Text style={[styles[variant], style]} {...rest}>
       {children}
     </Text>
   );
