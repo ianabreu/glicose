@@ -55,7 +55,7 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent />
       <InitialLayout />
-      <Toast topOffset={60} />
+      <Toast position="bottom" />
     </AuthProvider>
   );
 }

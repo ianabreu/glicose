@@ -42,9 +42,6 @@ export default function Home() {
         type: 'info',
         text1: 'Novo registro',
         text2: 'Insira seu 1º registro',
-        text1Style: { fontFamily: 'Bold', fontSize: 18, color: colors.onSurface },
-        text2Style: { fontFamily: 'Medium', fontSize: 16, color: colors.onBackground },
-        position: 'bottom',
       });
     }
   }, [isFocused]);
@@ -71,7 +68,7 @@ export default function Home() {
           <View>
             <View style={{ gap: 4 }}>
               <Header />
-              {lastGlucoseRecord && <Card data={lastGlucoseRecord} />}
+              {lastGlucoseRecord !== null && <Card data={lastGlucoseRecord} />}
             </View>
             <Link style={styles.link} href="/(auth)/new">
               Novo Registro
@@ -100,7 +97,7 @@ export default function Home() {
                 }}>
                 {selectedPeriodType || 'Últimos 100 resultados'}
               </Text>
-              <Chart data={glucoseRecords} />
+              {glucoseRecords.length > 0 && <Chart data={glucoseRecords} />}
             </Section>
 
             {metrics && metrics.total > 0 ? (
@@ -157,6 +154,9 @@ export default function Home() {
               <Empty />
             )}
           </View>
+          <Link style={styles.link} href="/(auth)/glicoseList">
+            Listar resultados
+          </Link>
         </ScrollView>
       </View>
     );

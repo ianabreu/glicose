@@ -8,7 +8,7 @@ import { CartesianChart, Line, useChartPressState, useChartTransformState } from
 import { GlucoseWithGlycemicRangeDTO } from '@/@types/Glucose';
 import { colors } from '@/constants/colors';
 
-interface ItemListProps {
+interface ChartProps {
   data: GlucoseWithGlycemicRangeDTO[];
 }
 
@@ -19,21 +19,22 @@ function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
   return <Circle cx={x} cy={y} r={8} color={colors.secondary} />;
 }
 
-export function Chart({ data }: ItemListProps) {
+export function Chart({ data }: ChartProps) {
   const { state, isActive } = useChartPressState({ x: 0, y: { value: 0 } });
   const transformState = useChartTransformState();
-  const font = useFont(require('../assets/fonts/NunitoSans_10pt-Regular.ttf'), 10, (err) =>
-    console.log('FontError: ' + err)
-  );
+  const font = useFont(require('../assets/fonts/NunitoSans_10pt-Regular.ttf'), 10);
 
   const [chartData, setChartData] = useState<{ day: number; value: number }[]>([]);
   useEffect(() => {
+    if (data.length === 0 || !data) {
+      return;
+    }
     const a: { day: number; value: number }[] = data.map((item) => ({
       day: item.date.getTime(),
       value: item.valueInMgDl,
     }));
     setChartData(a);
-  }, []);
+  }, [data]);
 
   const animatedText = useAnimatedProps(() => {
     return {
@@ -78,7 +79,7 @@ export function Chart({ data }: ItemListProps) {
           />
         </View>
       )}
-      {!isActive && chartData.length > 1 && (
+      {!isActive && chartData.length > 0 && (
         <View>
           <Text style={{ fontFamily: 'Bold', fontSize: 14, textAlign: 'right' }}>
             {chartData[0].value} mg/dl

@@ -22,6 +22,13 @@ export default function AuthLayout() {
         redirect={!isSignedIn}
       />
       <Stack.Screen
+        name="glicoseList"
+        options={{
+          headerTitle: 'Todos os registros',
+        }}
+        redirect={!isSignedIn}
+      />
+      <Stack.Screen
         name="profile"
         options={{
           headerTitle: 'Perfil',

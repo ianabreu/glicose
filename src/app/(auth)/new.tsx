@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -27,10 +27,13 @@ import { Select } from '@/components/Select';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGlucose } from '@/contexts/GlucoseContext';
+import { GlucoseServices } from '@/database/services';
 
 export default function New() {
+  const { id }: { id: string } = useLocalSearchParams();
   const router = useRouter();
-  const { addGlucoseRecord, glycemicRanges } = useGlucose();
+
+  const { updateGlucoseRecord, addGlucoseRecord, glycemicRanges } = useGlucose();
 
   useEffect(() => {
     const backAction = () => {
@@ -60,7 +63,21 @@ export default function New() {
 
   const [value, setValue] = useState('');
   const [notes, setNotes] = useState('');
+  const [isEdit, setIsEdit] = useState(false);
 
+  useEffect(() => {
+    if (id) {
+      GlucoseServices.getById(id).then((value) => {
+        setSelectedGlycemicRangeIndex(() =>
+          glycemicRanges.findIndex(({ id }) => id === value.glycemicRangeId)
+        );
+        setDate(value.date);
+        setValue(String(value.valueInMgDl));
+        setNotes(value.notes || '');
+        setIsEdit(true);
+      });
+    }
+  }, [id]);
   const handleChangeText = (text: string) => {
     if (text.length > 3) {
       return;
@@ -89,8 +106,13 @@ export default function New() {
     };
 
     try {
-      await addGlucoseRecord(data);
-      router.replace('/(auth)/home');
+      if (isEdit) {
+        await updateGlucoseRecord({ id, ...data });
+        router.back();
+      } else {
+        await addGlucoseRecord(data);
+        router.push('/(auth)/home');
+      }
     } catch (error) {
       console.log(error);
     }
@@ -121,7 +143,9 @@ export default function New() {
               <Feather name="arrow-left" size={30} color={colors.onPrimary} />
             </TouchableOpacity>
           )}
-          <Text style={styles.title}>{router.canGoBack() ? 'Nova' : 'Primeira'} Medição</Text>
+          <Text style={styles.title}>
+            {isEdit ? 'EDITAR' : router.canGoBack() ? 'Nova Medição' : 'Primeira Medição'}
+          </Text>
         </View>
         {/**************************Fim*Header*********************/}
 
@@ -166,7 +190,7 @@ export default function New() {
               multiline
               maxLength={100}
             />
-            <Button label="Salvar" onPress={onSave} />
+            <Button label={isEdit ? 'Editar' : 'Salvar'} onPress={onSave} />
           </View>
         </ScrollView>
         <DateTimeModal
