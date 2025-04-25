@@ -1,5 +1,12 @@
 import { ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextStyle, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { colors } from '@/constants/colors';
 
@@ -53,7 +60,7 @@ function Button({
           size={22}
         />
       ) : (
-        <>
+        <View style={styles.area}>
           {icon && <>{icon}</>}
           {label && (
             <Text
@@ -72,7 +79,7 @@ function Button({
               {label}
             </Text>
           )}
-        </>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -82,16 +89,10 @@ export { Button };
 
 const styles = StyleSheet.create({
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 8,
     width: 'auto',
-    paddingHorizontal: 8,
     minHeight: 40,
-    minWidth: 40,
     borderWidth: 1,
-    gap: 4,
   },
   text: {
     fontFamily: 'Medium',
@@ -102,5 +103,13 @@ const styles = StyleSheet.create({
   fill: {},
   stroke: {
     backgroundColor: 'trasparent',
+  },
+  area: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    height: 40,
+    paddingHorizontal: 8,
   },
 });

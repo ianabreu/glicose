@@ -47,7 +47,7 @@ export function Card({ data }: CardProps) {
         <View
           style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 4 }}>
           <Text style={[styles.textMedium, { fontSize: 16 }]}>{glycemicRange.response}</Text>
-          <View style={[styles.dot, { backgroundColor: glycemicRange.colorGradient[0] }]} />
+          <View style={[styles.dot, { backgroundColor: glycemicRange.color }]} />
         </View>
       </View>
     </LinearGradient>
