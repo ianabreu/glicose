@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet, ColorValue } from 'react-native';
 
 import { colors } from '@/constants/colors';
 
@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   onCancel: () => void;
   cancelText?: string;
   confirmText?: string;
+  actionColor?: ColorValue;
 }
 
 export function ConfirmDialog({
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   onCancel,
   cancelText = 'Cancelar',
   confirmText = 'Confirmar',
+  actionColor = colors.primary,
 }: ConfirmDialogProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
@@ -32,7 +34,9 @@ export function ConfirmDialog({
             <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
               <Text style={styles.cancelText}>{cancelText}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
+            <TouchableOpacity
+              style={[styles.confirmButton, { backgroundColor: actionColor }]}
+              onPress={onConfirm}>
               <Text style={styles.confirmText}>{confirmText}</Text>
             </TouchableOpacity>
           </View>
@@ -88,7 +92,6 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     padding: 10,
-    backgroundColor: colors.primary,
     borderRadius: 8,
   },
   confirmText: {

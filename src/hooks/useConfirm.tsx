@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { ColorValue } from 'react-native';
 
 import { ConfirmDialog } from '../components/ConfirmDialog';
 interface ConfigProps {
@@ -6,6 +7,7 @@ interface ConfigProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  actionColor?: ColorValue;
 }
 export const useConfirm = () => {
   const [visible, setVisible] = useState(false);
@@ -14,6 +16,7 @@ export const useConfirm = () => {
     message: '',
     confirmText: '',
     cancelText: '',
+    actionColor: '',
   });
   const [resolver, setResolver] = useState<((value: boolean) => void) | null>(null);
 
@@ -23,9 +26,13 @@ export const useConfirm = () => {
       cancelText,
       message,
       title,
-    }: Pick<ConfigProps, 'confirmText' | 'cancelText' | 'message' | 'title'>): Promise<boolean> => {
+      actionColor,
+    }: Pick<
+      ConfigProps,
+      'confirmText' | 'cancelText' | 'message' | 'title' | 'actionColor'
+    >): Promise<boolean> => {
       return new Promise((resolve) => {
-        setConfig({ title, message, cancelText, confirmText });
+        setConfig({ title, message, cancelText, confirmText, actionColor });
         setVisible(true);
         setResolver(() => resolve);
       });
@@ -52,6 +59,7 @@ export const useConfirm = () => {
       confirmText={config.confirmText}
       onConfirm={handleConfirm}
       onCancel={handleCancel}
+      actionColor={config.actionColor}
     />
   );
 

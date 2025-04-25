@@ -1,10 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { FlatList, Modal, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { FlatList, Modal, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { Button } from '@/components/Button';
+import { Empty } from '@/components/Empty';
 import { Filters } from '@/components/Filters';
 import { Item } from '@/components/Item';
 import { colors } from '@/constants/colors';
@@ -17,6 +18,9 @@ export default function GlicoseList() {
   const { Confirm, confirm } = useConfirm();
   const [openFiltersModal, setOpenFiltersModal] = useState(false);
   const router = useRouter();
+  useEffect(() => {
+    getGlucoseRecords();
+  }, []);
 
   function handleCloseFilters() {
     setOpenFiltersModal(false);
@@ -29,6 +33,7 @@ export default function GlicoseList() {
     const isConfirmed = await confirm({
       title: 'Excluir',
       message: 'Tem certeza que deseja excluir?',
+      actionColor: colors.error,
     });
     if (isConfirmed) {
       const isDeleted = await GlucoseServices.delete(id);
@@ -52,6 +57,7 @@ export default function GlicoseList() {
       router.push({ pathname: '/(auth)/new', params: { id } });
     }
   }
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -83,6 +89,7 @@ export default function GlicoseList() {
         )}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={() => <Empty />}
       />
       {Confirm}
     </View>

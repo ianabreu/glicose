@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from './Button';
 
@@ -23,9 +23,7 @@ export function Item({ data, deleteItem, editItem }: ItemProps) {
   }
   return (
     <Pressable onLongPress={handleDeleteItem}>
-      <View
-        key={data.id}
-        style={[styles.container, { borderLeftColor: dataRange.colorGradient[0] }]}>
+      <View key={data.id} style={[styles.container, { borderLeftColor: dataRange.color }]}>
         <View style={[{ width: '20%' }]}>
           <Text style={styles.value}>{data.valueInMgDl}</Text>
           <Text style={styles.unit}>mg/dl</Text>

@@ -5,13 +5,12 @@ import { StyleSheet, View } from 'react-native';
 import { Title } from './Title';
 
 import { colors } from '@/constants/colors';
-
 export function Header() {
   return (
     <View style={styles.headerArea}>
       <Title variant="header">Página Inicial</Title>
       <View style={styles.buttonArea}>
-        <Link style={styles.iconButton} href="/(auth)/new">
+        <Link style={styles.iconButton} href="/(auth)/exportToFile">
           <Feather name="upload" size={25} />
         </Link>
         <Link style={styles.iconButton} href="/(auth)/profile">
