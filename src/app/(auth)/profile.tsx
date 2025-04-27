@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
 import { useState } from 'react';
 import {
+  Alert,
+  Image,
   Keyboard,
   Modal,
   Pressable,
@@ -11,10 +13,11 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import onBoardingImage from '@/assets/onboarding.png';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { Option } from '@/components/Option';
 import { Title } from '@/components/Title';
-import { Option } from '@/components/profile-option';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -44,18 +47,22 @@ export default function Profile() {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
-        <Stack.Screen
-          options={{
-            navigationBarColor: colors.background,
-            headerShown: true,
-            headerStyle: { backgroundColor: colors.background },
-            headerTitleStyle: { fontSize: 20, fontFamily: 'Bold', color: colors.primary },
-            animation: 'slide_from_right',
-            headerBackVisible: true,
-            headerTintColor: colors.primary,
-          }}
-        />
         <ScrollView showsVerticalScrollIndicator={false}>
+          <Stack.Screen
+            options={{
+              navigationBarColor: colors.background,
+              headerShown: true,
+              headerStyle: { backgroundColor: colors.background },
+              headerTitleStyle: { fontSize: 20, fontFamily: 'Bold', color: colors.primary },
+              animation: 'slide_from_right',
+              headerBackVisible: true,
+              headerTintColor: colors.primary,
+            }}
+          />
+          <View style={styles.card}>
+            <Image source={onBoardingImage} style={styles.image} resizeMode="contain" />
+          </View>
+
           <Title>Dados Pessoais</Title>
 
           <View style={styles.card}>
@@ -73,10 +80,17 @@ export default function Profile() {
 
           <Title>Configurações</Title>
           <View style={styles.card}>
-            <Option>
-              <Option.Icon icon="water-drop" />
-              <Option.Title>Níveis de açúcar recomendados</Option.Title>
-              <Option.Icon icon="chevron-right" />
+            <Option
+              onPress={() => {
+                Alert.alert(
+                  'Em desenvolvimento!',
+                  'Esta funcionalidade ainda está sendo criada. 🚧',
+                  [{ text: 'Ok', onPress: () => console.log('Usuário fechou o alerta') }]
+                );
+              }}>
+              <Option.Icon name="water" color={colors.error} />
+              <Option.Text>Níveis de açúcar recomendados</Option.Text>
+              <Option.Icon name="chevron-right" />
             </Option>
           </View>
         </ScrollView>
@@ -120,9 +134,9 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 16,
     paddingHorizontal: 16,
     backgroundColor: colors.background,
+    marginBottom: 50,
   },
   card: {
     padding: 8,
@@ -146,7 +160,10 @@ const styles = StyleSheet.create({
     color: colors.onPrimary,
     fontFamily: 'Bold',
   },
-
+  image: {
+    maxWidth: '100%',
+    height: 200,
+  },
   legend: {
     fontFamily: 'Medium',
     color: colors.primary,

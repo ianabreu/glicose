@@ -14,6 +14,7 @@ import {
 import onBoardingImage from '@/assets/onboarding.png';
 import { Button } from '@/components/Button/index';
 import { Input } from '@/components/Input';
+import { Title } from '@/components/Title';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserServices } from '@/database/services';
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
   async function addUser() {
     try {
-      if (!name || name === '') {
+      if (!name || name.trim() === '') {
         setError('Nome é obrigatório.');
         return;
       }
@@ -53,20 +54,21 @@ export default function LoginPage() {
         <Stack.Screen options={{ navigationBarColor: colors.background }} />
 
         <KeyboardAvoidingView style={styles.container}>
-          <View>
-            <Image source={onBoardingImage} style={styles.image} resizeMode="contain" />
-          </View>
-          <Text style={styles.wellcome}>Bem vindo!</Text>
+          <Image source={onBoardingImage} style={styles.image} resizeMode="contain" />
+          <Title variant="header">Bem vindo!</Title>
           <Text style={styles.label}>Insira seu nome para iniciar</Text>
           <Input
             placeholder="Digite seu nome"
             value={name}
             onChangeText={onChangeText}
             error={error}
+            label="Digite seu nome"
           />
-          <Button disabled={loading} onPress={addUser}>
-            <Button.Text>Entrar</Button.Text>
-          </Button>
+          <View style={{ width: '100%' }}>
+            <Button disabled={loading} onPress={addUser}>
+              <Button.Text>Entrar</Button.Text>
+            </Button>
+          </View>
         </KeyboardAvoidingView>
       </View>
     </TouchableWithoutFeedback>
@@ -86,12 +88,6 @@ const styles = StyleSheet.create({
 
   image: {
     maxWidth: '80%',
-  },
-  wellcome: {
-    fontFamily: 'Bold',
-    textAlign: 'center',
-    fontSize: 22,
-    color: colors.onBackground,
   },
   label: {
     fontFamily: 'Medium',
