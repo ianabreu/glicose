@@ -35,6 +35,13 @@ export default function AuthLayout() {
         }}
         redirect={!isSignedIn}
       />
+      <Stack.Screen
+        name="exportToFile"
+        options={{
+          headerTitle: 'Gerar relatório',
+        }}
+        redirect={!isSignedIn}
+      />
     </Stack>
   );
 }

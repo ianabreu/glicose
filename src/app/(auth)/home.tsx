@@ -1,4 +1,3 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import { Link, Stack, useRouter } from 'expo-router';
@@ -6,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { Button } from '@/components/Button';
+import { Button } from '@/components/Button/index';
 import { Card } from '@/components/Card';
 import { Chart } from '@/components/Chart';
 import { Empty } from '@/components/Empty';
@@ -52,7 +51,6 @@ export default function Home() {
   function handleCloseFilters() {
     setOpenFiltersModal(false);
   }
-
   if (loadingLastGlucoseRecord) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
@@ -75,14 +73,20 @@ export default function Home() {
             </Link>
 
             <Section>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
                 <Title>Informações</Title>
-                <Button
-                  label="Filtro"
-                  variant="stroke"
-                  onPress={openFilters}
-                  icon={<MaterialCommunityIcons name="filter" color={colors.secondary} size={20} />}
-                />
+                <View>
+                  <Button onPress={openFilters} variant="outline">
+                    <Button.Text>Filtrar</Button.Text>
+                    <Button.Icon name="filter" />
+                  </Button>
+                </View>
+
                 <Modal visible={openFiltersModal} transparent animationType="slide">
                   <Filters closeModal={handleCloseFilters} />
                 </Modal>

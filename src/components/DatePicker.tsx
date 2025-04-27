@@ -9,6 +9,7 @@ interface DateTimeModalProps {
   onCloseModal: (isOpen: boolean) => void;
   onDateChange: (date: Date) => void;
   error?: string;
+  title?: string;
 }
 export function DateTimeModal({
   date = new Date(),
@@ -46,6 +47,7 @@ export function DatePickerUI({
   onDateChange,
   onCloseModal,
   error,
+  title = 'Selecione a data',
 }: DateTimeModalProps) {
   function handleDateChange(date: Date) {
     onDateChange(date);
@@ -82,7 +84,7 @@ export function DatePickerUI({
         onCancel={() => {
           onCloseModal(false);
         }}
-        title="Selecione a data"
+        title={title}
         confirmText="Confirmar"
         cancelText="Cancelar"
       />

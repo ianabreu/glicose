@@ -1,4 +1,3 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, Modal, StyleSheet, View } from 'react-native';
@@ -71,12 +70,10 @@ export default function GlicoseList() {
           headerTintColor: colors.primary,
         }}
       />
-      <Button
-        label="Filtrar resultados"
-        variant="stroke"
-        onPress={openFilters}
-        icon={<MaterialCommunityIcons name="filter" color={colors.secondary} size={20} />}
-      />
+      <Button variant="outline" onPress={openFilters}>
+        <Button.Icon name="filter" />
+        <Button.Text>Filtrar resultados</Button.Text>
+      </Button>
 
       <Modal visible={openFiltersModal} transparent animationType="slide">
         <Filters closeModal={handleCloseFilters} />

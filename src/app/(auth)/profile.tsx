@@ -1,17 +1,11 @@
-import { Feather, Entypo as Icon, MaterialIcons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useNavigation } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useState } from 'react';
 import {
   Keyboard,
   Modal,
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -101,15 +95,9 @@ export default function Profile() {
                 alignItems: 'center',
               }}>
               <Title>Editar dados pessoais</Title>
-              <Pressable
-                onPress={toogleModal}
-                style={{
-                  padding: 8,
-                  backgroundColor: colors.surface,
-                  borderRadius: 50,
-                }}>
-                <MaterialIcons name="close" color={colors.error} size={20} />
-              </Pressable>
+              <Button onPress={toogleModal} variant="outline">
+                <Button.Icon name="close" color={colors.primary} size={20} />
+              </Button>
             </View>
             <Input value={firstName} onChangeText={setFirstName} label="Nome" placeholder="Nome" />
             <Input
@@ -118,7 +106,10 @@ export default function Profile() {
               label="Sobrenome"
               placeholder="Sobrenome"
             />
-            <Button label="Salvar" onPress={handleSave} />
+            <Button onPress={handleSave}>
+              <Button.Icon name="floppy" />
+              <Button.Text>Salvar</Button.Text>
+            </Button>
           </View>
         </Modal>
       </View>

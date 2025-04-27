@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import onBoardingImage from '@/assets/onboarding.png';
-import { Button } from '@/components/Button';
+import { Button } from '@/components/Button/index';
 import { Input } from '@/components/Input';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,7 +64,9 @@ export default function LoginPage() {
             onChangeText={onChangeText}
             error={error}
           />
-          <Button label="Entrar" disabled={loading} onPress={addUser} />
+          <Button disabled={loading} onPress={addUser}>
+            <Button.Text>Entrar</Button.Text>
+          </Button>
         </KeyboardAvoidingView>
       </View>
     </TouchableWithoutFeedback>

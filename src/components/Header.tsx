@@ -1,7 +1,7 @@
-import { Feather } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { Button } from './Button';
 import { Title } from './Title';
 
 import { colors } from '@/constants/colors';
@@ -11,10 +11,10 @@ export function Header() {
       <Title variant="header">Página Inicial</Title>
       <View style={styles.buttonArea}>
         <Link style={styles.iconButton} href="/(auth)/exportToFile">
-          <Feather name="upload" size={25} />
+          <Button.Icon name="file-export-outline" color={colors.primary} size={30} />
         </Link>
         <Link style={styles.iconButton} href="/(auth)/profile">
-          <Feather name="user" size={25} />
+          <Button.Icon name="account-circle" color={colors.primary} size={30} />
         </Link>
       </View>
     </View>
@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconButton: {
-    padding: 4,
+    padding: 6,
     borderRadius: 8,
-    color: colors.secondary,
+    color: colors.primary,
   },
 });

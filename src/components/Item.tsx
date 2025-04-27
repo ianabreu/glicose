@@ -1,4 +1,3 @@
-import { Feather } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from './Button';
@@ -28,18 +27,16 @@ export function Item({ data, deleteItem, editItem }: ItemProps) {
           <Text style={styles.value}>{data.valueInMgDl}</Text>
           <Text style={styles.unit}>mg/dl</Text>
         </View>
-        <View style={{ justifyContent: 'center', gap: 4, width: '70%' }}>
+        <View style={{ justifyContent: 'center', gap: 4, width: '67%' }}>
           <Text style={styles.range}>
             {dataRange.response} - {data.glycemicRange?.description}
           </Text>
           <Text style={styles.date}>{formatDate(data.date)}</Text>
         </View>
-        <View style={[{ width: '10%' }]}>
-          <Button
-            onPress={handleEditItem}
-            variant="link"
-            icon={<Feather name="edit" size={20} color={colors.secondary} />}
-          />
+        <View style={[{ width: '13%' }]}>
+          <Button onPress={handleEditItem} variant="outline">
+            <Button.Icon name="square-edit-outline" />
+          </Button>
         </View>
       </View>
     </Pressable>
@@ -52,7 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    padding: 8,
+    paddingVertical: 8,
     marginVertical: 8,
     borderLeftWidth: 8,
     borderRadius: 8,

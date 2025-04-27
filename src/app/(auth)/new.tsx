@@ -57,6 +57,7 @@ export default function New() {
 
   const { user } = useAuth();
   const [selectedGlycemicRangeIndex, setSelectedGlycemicRangeIndex] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   const [date, setDate] = useState(new Date());
   const [openDateModal, setOpenDateModal] = useState(false);
@@ -87,6 +88,7 @@ export default function New() {
   };
 
   async function onSave() {
+    setLoading(true);
     if (!value || isNaN(parseFloat(value)) || parseFloat(value) < 18 || parseFloat(value) > 630) {
       Toast.show({
         type: 'error',
@@ -95,6 +97,7 @@ export default function New() {
         text1Style: { fontFamily: 'Bold', fontSize: 18, color: colors.error },
         text2Style: { fontFamily: 'Medium', fontSize: 16, color: colors.error },
       });
+      setLoading(false);
       return;
     }
     const data: CreateGlucoseDTO = {
@@ -108,13 +111,16 @@ export default function New() {
     try {
       if (isEdit) {
         await updateGlucoseRecord({ id, ...data });
+        setLoading(false);
         router.back();
       } else {
         await addGlucoseRecord(data);
+        setLoading(false);
         router.push('/(auth)/home');
       }
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   }
   function handleBack() {
@@ -190,7 +196,13 @@ export default function New() {
               multiline
               maxLength={100}
             />
-            <Button label={isEdit ? 'Editar' : 'Salvar'} onPress={onSave} />
+
+            <View style={{ flex: 1, width: '100%' }}>
+              <Button onPress={onSave} activeOpacity={0.8} loading={loading}>
+                <Button.Text>{isEdit ? 'Editar' : 'Salvar'}</Button.Text>
+                <Button.Icon name="floppy" />
+              </Button>
+            </View>
           </View>
         </ScrollView>
         <DateTimeModal

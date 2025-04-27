@@ -1,4 +1,3 @@
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { subDays, compareAsc } from 'date-fns';
 import { useState } from 'react';
 import { Alert, Modal, StyleSheet, Text, View } from 'react-native';
@@ -95,11 +94,9 @@ export function Filters({ closeModal }: FiltersProps) {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Filtros</Text>
-          <Button
-            variant="link"
-            icon={<Feather name="x" color={colors.error} size={25} />}
-            onPress={() => handleClose()}
-          />
+          <Button variant="outline" onPress={handleClose}>
+            <Button.Icon name="close" />
+          </Button>
         </View>
         <View style={{ gap: 16 }}>
           <Text style={styles.subtitle}>Período</Text>
@@ -137,21 +134,21 @@ export function Filters({ closeModal }: FiltersProps) {
             gap: 16,
           }}>
           <Button
-            label="Cancelar"
-            variant="link"
-            textStyles={{ color: colors.onSurface, opacity: 0.5 }}
+            variant="outline"
             onPress={() => {
               handleClose();
-            }}
-          />
+            }}>
+            <Button.Text>Cancelar</Button.Text>
+          </Button>
           <Button
-            label="Filtrar"
-            icon={<MaterialCommunityIcons name="filter" size={20} color={colors.onPrimary} />}
+            variant="filled"
             onPress={() => {
               setFilters({ selectedPeriod, selectedPeriodType, glycemicRange: selectedConditions });
               handleClose();
-            }}
-          />
+            }}>
+            <Button.Icon name="filter" />
+            <Button.Text>Filtrar</Button.Text>
+          </Button>
         </View>
         <Modal visible={openCalendarModal} transparent animationType="fade">
           <View style={styles.overlay}>
@@ -174,24 +171,27 @@ export function Filters({ closeModal }: FiltersProps) {
                 onDateChange={setFinalDate}
               />
 
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
                 <Button
-                  variant="link"
-                  label="Cancelar"
-                  textStyles={{ fontFamily: 'Normal', color: colors.onBackground, opacity: 0.8 }}
-                  icon={<MaterialCommunityIcons name="check" size={20} color={colors.onPrimary} />}
+                  variant="outline"
                   onPress={() => {
                     setInitialDate(undefined);
                     setFinalDate(undefined);
                     toggleCalendarModal();
-                  }}
-                />
+                  }}>
+                  <Button.Icon name="close" />
+                  <Button.Text>Cancelar</Button.Text>
+                </Button>
 
-                <Button
-                  label="Confirmar"
-                  icon={<MaterialCommunityIcons name="check" size={20} color={colors.onPrimary} />}
-                  onPress={handleConfirmCustomDate}
-                />
+                <Button onPress={handleConfirmCustomDate}>
+                  <Button.Icon name="check" />
+                  <Button.Text>Confirmar</Button.Text>
+                </Button>
               </View>
             </View>
           </View>
