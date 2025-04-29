@@ -303,7 +303,7 @@ body {
 
         <footer>
       <p>
-      Relatório gerado pelo aplicativo <strong>Glicontrol</strong> em
+      Relatório gerado pelo aplicativo <strong>Glicose</strong> em
       ${format(new Date(), 'dd/MM/yyyy,  HH:mm:ss')}
       </p>
     </footer>
