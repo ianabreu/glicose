@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
@@ -16,31 +16,28 @@ type ButtonProps = {
   variant?: 'filled' | 'outline';
 } & TouchableOpacityProps;
 
-export function Button({
-  children,
-  loading = false,
-  variant = 'filled',
-  style,
-  ...touchableOpacityProps
-}: ButtonProps) {
-  return (
-    <ButtonContext.Provider value={{ loading, variant }}>
-      <TouchableOpacity
-        style={[styles.base, variant === 'outline' ? styles.outline : styles.filled, style]}
-        disabled={loading}
-        {...touchableOpacityProps}>
-        {loading ? (
-          <ActivityIndicator
-            size="small"
-            color={variant === 'outline' ? colors.secondary : colors.onPrimary}
-          />
-        ) : (
-          children
-        )}
-      </TouchableOpacity>
-    </ButtonContext.Provider>
-  );
-}
+export const Button = forwardRef<React.ElementRef<typeof TouchableOpacity>, ButtonProps>(
+  ({ children, loading = false, variant = 'filled', style, ...touchableOpacityProps }, ref) => {
+    return (
+      <ButtonContext.Provider value={{ loading, variant }}>
+        <TouchableOpacity
+          ref={ref}
+          style={[styles.base, variant === 'outline' ? styles.outline : styles.filled, style]}
+          disabled={loading}
+          {...touchableOpacityProps}>
+          {loading ? (
+            <ActivityIndicator
+              size="small"
+              color={variant === 'outline' ? colors.secondary : colors.onPrimary}
+            />
+          ) : (
+            children
+          )}
+        </TouchableOpacity>
+      </ButtonContext.Provider>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   base: {

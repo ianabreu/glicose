@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import { Link, Stack, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { Button } from '@/components/Button/index';
@@ -22,10 +22,10 @@ export default function Home() {
   const router = useRouter();
   const {
     glucoseRecords,
+    loadingGlucoseRecords,
     metrics,
     lastGlucoseRecord,
     loadingLastGlucoseRecord,
-    selectedPeriodType,
     glycemicRanges,
   } = useGlucose();
 
@@ -51,120 +51,178 @@ export default function Home() {
   function handleCloseFilters() {
     setOpenFiltersModal(false);
   }
-  if (loadingLastGlucoseRecord) {
-    return (
-      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
-        <ActivityIndicator size={35} color={colors.primary} />
-        <Text>Loading</Text>
-      </View>
-    );
-  } else {
-    return (
-      <View style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false} horizontal={false}>
-          <Stack.Screen options={{ navigationBarColor: colors.background }} />
-          <View>
-            <View style={{ gap: 4 }}>
-              <Header />
-              {lastGlucoseRecord !== null && <Card data={lastGlucoseRecord} />}
-            </View>
-            <Link style={styles.link} href="/(auth)/new">
-              Novo Registro
-            </Link>
 
-            <Section>
+  return (
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} horizontal={false}>
+        <Stack.Screen options={{ navigationBarColor: colors.background }} />
+        <View style={{ gap: 8 }}>
+          <View style={{ gap: 4 }}>
+            <Header />
+            {loadingLastGlucoseRecord && (
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Title>Informações</Title>
-                <View>
-                  <Button onPress={openFilters} variant="outline">
-                    <Button.Text>Filtrar</Button.Text>
-                    <Button.Icon name="filter" />
-                  </Button>
-                </View>
-
-                <Modal visible={openFiltersModal} transparent animationType="slide">
-                  <Filters closeModal={handleCloseFilters} />
-                </Modal>
-              </View>
-
-              <Text
+                  borderRadius: 8,
+                  height: 130,
+                  backgroundColor: colors.border,
+                }}
+              />
+            )}
+            {!loadingLastGlucoseRecord && lastGlucoseRecord === null && (
+              <View
                 style={{
-                  fontFamily: 'Bold',
-                  opacity: 0.8,
-                  color: colors.onSurface,
-                  fontSize: 12,
-                }}>
-                {selectedPeriodType || 'Últimos 100 resultados'}
-              </Text>
-              {glucoseRecords.length > 0 && <Chart data={glucoseRecords} />}
-            </Section>
-
-            {metrics && metrics.total > 0 ? (
-              <View style={{ flexWrap: 'wrap', flexDirection: 'row', gap: 16, marginVertical: 8 }}>
-                <Info.Container>
-                  <Info.Title>Média</Info.Title>
-                  <Info.Row>
-                    <Info.Icon name="activity" />
-                    <Info.Value unit="mg/dl">{metrics.average.toFixed(1)}</Info.Value>
-                  </Info.Row>
-                </Info.Container>
-
-                <Info.Container>
-                  <Info.Title>Total de Medições</Info.Title>
-                  <Info.Row>
-                    <Info.Icon name="bar-chart-2" />
-                    <Info.Value>{metrics?.total}</Info.Value>
-                  </Info.Row>
-                </Info.Container>
-
-                <Info.Container>
-                  <Info.Title>Maior Valor</Info.Title>
-                  <Info.Row>
-                    <Info.Icon name="trending-up" />
-                    <Info.Value unit="mg/dl">{metrics.max?.valueInMgDl || 0}</Info.Value>
-                  </Info.Row>
-                  <Info.Row>
-                    <Info.Helper>
-                      {
-                        glycemicRanges.find((item) => item.id === metrics.max?.glycemicRangeId)
-                          ?.description
-                      }
-                    </Info.Helper>
-                  </Info.Row>
-                </Info.Container>
-
-                <Info.Container>
-                  <Info.Title>Menor Valor</Info.Title>
-                  <Info.Row>
-                    <Info.Icon name="trending-down" />
-                    <Info.Value unit="mg/dl">{metrics.min?.valueInMgDl || 0}</Info.Value>
-                  </Info.Row>
-                  <Info.Row>
-                    <Info.Helper>
-                      {
-                        glycemicRanges.find((item) => item.id === metrics.min?.glycemicRangeId)
-                          ?.description
-                      }
-                    </Info.Helper>
-                  </Info.Row>
-                </Info.Container>
-              </View>
-            ) : (
-              <Empty />
+                  borderRadius: 8,
+                  height: 130,
+                  backgroundColor: colors.border,
+                }}
+              />
+            )}
+            {!loadingLastGlucoseRecord && lastGlucoseRecord !== null && (
+              <Card data={lastGlucoseRecord} />
             )}
           </View>
-          <Link style={styles.link} href="/(auth)/glicoseList">
-            Listar resultados
+          <Link href="/(auth)/new" asChild>
+            <Button>
+              <Button.Icon name="plus" />
+              <Button.Text>Novo Registro</Button.Text>
+            </Button>
           </Link>
-        </ScrollView>
-      </View>
-    );
-  }
+
+          <Section>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Title>Informações</Title>
+              <View>
+                <Button onPress={openFilters} variant="outline">
+                  <Button.Text>Filtrar</Button.Text>
+                  <Button.Icon name="filter" />
+                </Button>
+              </View>
+
+              <Modal visible={openFiltersModal} transparent animationType="slide">
+                <Filters closeModal={handleCloseFilters} />
+              </Modal>
+            </View>
+
+            {loadingGlucoseRecords && (
+              <View
+                style={{
+                  borderRadius: 8,
+                  height: 200,
+                  backgroundColor: colors.border,
+                }}
+              />
+            )}
+
+            {!loadingGlucoseRecords && <Chart data={glucoseRecords} />}
+          </Section>
+          {loadingGlucoseRecords && (
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row', gap: 16, marginVertical: 8 }}>
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '40%',
+                  borderRadius: 8,
+                  height: 80,
+                  backgroundColor: colors.border,
+                }}
+              />
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '40%',
+                  borderRadius: 8,
+                  height: 80,
+                  backgroundColor: colors.border,
+                }}
+              />
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '40%',
+                  borderRadius: 8,
+                  height: 80,
+                  backgroundColor: colors.border,
+                }}
+              />
+              <View
+                style={{
+                  flex: 1,
+                  minWidth: '40%',
+                  borderRadius: 8,
+                  height: 80,
+                  backgroundColor: colors.border,
+                }}
+              />
+            </View>
+          )}
+          {!loadingGlucoseRecords && glucoseRecords.length === 0 && <Empty />}
+
+          {metrics && metrics.total > 0 && (
+            <View style={{ flexWrap: 'wrap', flexDirection: 'row', gap: 16, marginVertical: 8 }}>
+              <Info.Container>
+                <Info.Title>Média</Info.Title>
+                <Info.Row>
+                  <Info.Icon name="activity" />
+                  <Info.Value unit="mg/dl">{metrics.average.toFixed(1)}</Info.Value>
+                </Info.Row>
+              </Info.Container>
+
+              <Info.Container>
+                <Info.Title>Total de Medições</Info.Title>
+                <Info.Row>
+                  <Info.Icon name="bar-chart-2" />
+                  <Info.Value>{metrics?.total}</Info.Value>
+                </Info.Row>
+              </Info.Container>
+
+              <Info.Container>
+                <Info.Title>Maior Valor</Info.Title>
+                <Info.Row>
+                  <Info.Icon name="trending-up" />
+                  <Info.Value unit="mg/dl">{metrics.max?.valueInMgDl || 0}</Info.Value>
+                </Info.Row>
+                <Info.Row>
+                  <Info.Helper>
+                    {
+                      glycemicRanges.find((item) => item.id === metrics.max?.glycemicRangeId)
+                        ?.description
+                    }
+                  </Info.Helper>
+                </Info.Row>
+              </Info.Container>
+
+              <Info.Container>
+                <Info.Title>Menor Valor</Info.Title>
+                <Info.Row>
+                  <Info.Icon name="trending-down" />
+                  <Info.Value unit="mg/dl">{metrics.min?.valueInMgDl || 0}</Info.Value>
+                </Info.Row>
+                <Info.Row>
+                  <Info.Helper>
+                    {
+                      glycemicRanges.find((item) => item.id === metrics.min?.glycemicRangeId)
+                        ?.description
+                    }
+                  </Info.Helper>
+                </Info.Row>
+              </Info.Container>
+            </View>
+          )}
+        </View>
+        <Link href="/(auth)/glicoseList" asChild>
+          <Button>
+            <Button.Icon name="format-list-bulleted" />
+            <Button.Text>Listar resultados</Button.Text>
+          </Button>
+        </Link>
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -176,14 +234,22 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight + 16,
   },
   link: {
-    marginVertical: 8,
-    borderRadius: 8,
-    textAlign: 'center',
-    paddingVertical: 12,
-    fontFamily: 'Medium',
-    fontSize: 16,
-    backgroundColor: colors.secondary,
-    color: colors.onSecondary,
+    width: '100%',
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red',
+    // marginVertical: 8,
+    // borderRadius: 8,
+    // textAlign: 'center',
+    // paddingVertical: 12,
+    // fontFamily: 'Medium',
+    // fontSize: 16,
+    // backgroundColor: colors.primary,
+    // borderColor: colors.primary,
+    // color: colors.onPrimary,
+    // borderWidth: 1,
   },
   filterArea: {
     height: 'auto',

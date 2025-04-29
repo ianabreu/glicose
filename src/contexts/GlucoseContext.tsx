@@ -1,4 +1,3 @@
-import { subDays } from 'date-fns';
 import React, {
   createContext,
   Dispatch,
@@ -29,6 +28,7 @@ type Metrics = {
 
 type GlucoseContextData = {
   loadingLastGlucoseRecord: boolean;
+  loadingGlucoseRecords: boolean;
   glucoseRecords: GlucoseWithGlycemicRangeDTO[];
   glycemicRanges: GlycemicRangeDTO[];
   lastGlucoseRecord: GlucoseWithGlycemicRangeDTO | null;
@@ -73,6 +73,7 @@ const GlucoseContext = createContext({} as GlucoseContextData);
 export function GlucoseProvider({ children }: GlucoseProviderProps) {
   const { user } = useAuth();
   const [glucoseRecords, setGlucoseRecords] = useState<GlucoseWithGlycemicRangeDTO[]>([]);
+  const [loadingGlucoseRecords, setLoadingGlucoseRecords] = useState<boolean>(true);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loadingLastGlucoseRecord, setLoadingLastGlucoseRecord] = useState<boolean>(true);
   const [lastGlucoseRecord, setLastGlucoseRecord] = useState<GlucoseWithGlycemicRangeDTO | null>(
@@ -113,6 +114,7 @@ export function GlucoseProvider({ children }: GlucoseProviderProps) {
 
   async function getGlucoseRecords() {
     if (!user) return;
+    setLoadingGlucoseRecords(true);
     if (selectedPeriod) {
       const response = await GlucoseServices.getGlucoseRecordsByPeriodAndGlycemicRange({
         userId: user.uid,
@@ -121,9 +123,11 @@ export function GlucoseProvider({ children }: GlucoseProviderProps) {
         glycemicRangeId: selectedGlycemicRange,
       });
       setGlucoseRecords(response);
+      setLoadingGlucoseRecords(false);
     } else {
       const response = await GlucoseServices.getLastGlucoseRecords({ userId: user.uid });
       setGlucoseRecords(response);
+      setLoadingGlucoseRecords(false);
     }
   }
   function getMetrics() {
@@ -202,6 +206,7 @@ export function GlucoseProvider({ children }: GlucoseProviderProps) {
   return (
     <GlucoseContext.Provider
       value={{
+        loadingGlucoseRecords,
         updateGlucoseRecord,
         loadingLastGlucoseRecord,
         getGlucoseRecords,

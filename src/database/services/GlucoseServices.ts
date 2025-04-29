@@ -1,6 +1,5 @@
 import { DateType } from 'react-native-ui-datepicker';
 import { UpdateMode } from 'realm';
-import { DefaultObject } from 'realm/dist/public-types/schema';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GlucoseSchema, GlycemicRangeSchema } from '../schemas';
