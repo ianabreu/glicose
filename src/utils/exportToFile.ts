@@ -280,22 +280,7 @@ body {
             </tr>
             </tbody>
       </table>
-      <figure style="text-align: center; margin-top: 1rem">
-      <img
-          src="./chart.png"
-          alt="Gráfico de glicemia ao longo do período"
-          style="
-          max-width: 100%;
-          height: auto;
-          border: 1px solid #ccc;
-            padding: 4px;
-            border-radius: 8px;
-          "
-        />
-        <figcaption style="font-size: 0.75rem; color: #555; margin-top: 0.5rem">
-        Evolução da glicemia durante o período de apuração
-        </figcaption>
-        </figure>
+      
         </section>
 
         <section>

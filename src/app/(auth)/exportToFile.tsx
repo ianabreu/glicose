@@ -91,7 +91,6 @@ export default function ExportToFile() {
       start: format(selectedPeriod.startDate, 'dd/MM/yyyy'),
       end: format(selectedPeriod.endDate, 'dd/MM/yyyy'),
     });
-    console.log(loading);
 
     setLoading(false);
   }
